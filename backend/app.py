@@ -93,4 +93,22 @@ def login():
     return jsonify(user_data), 200
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True) 
+from google import genai
+
+client = genai.Client(api_key="process.env.VITE_GEMINI_API_KEY")
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=(
+        "Provide detailed information about traditional farming, including the following aspects:\n"
+        "- Traditional farming methods and techniques used in different regions\n"
+        "- Climate conditions suitable for various crops\n"
+        "- Harvesting methods for different types of crops\n"
+        "- Marketing strategies used by farmers to sell their produce\n"
+        "- Types of bio-fertilizers used in sustainable farming\n"
+        "- General farming best practices to enhance productivity and soil health"
+    ),
+)   
+
+print(response.text)

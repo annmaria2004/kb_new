@@ -10,6 +10,11 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Profile } from './pages/Profile';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { Rubber } from './pages/iks/Rubber';
+import { Avocado } from './pages/iks/Avocado';
+import { Nutmeg } from './pages/iks/Nutmeg';
+import { Cardamom } from './pages/iks/Cardamom';
+import ProductDetails from './pages/ProductDetails';
 
 function App() {
   return (
@@ -20,9 +25,15 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<Products />} />
+            <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/offices" element={<Offices />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/iks/rubber" element={<Rubber />} />
+            <Route path="/iks/avocado" element={<Avocado />} />
+            <Route path="/iks/nutmeg" element={<Nutmeg />} />
+            <Route path="/iks/cardamom" element={<Cardamom />} />
             <Route
               path="/profile"
               element={
@@ -34,7 +45,7 @@ function App() {
             <Route
               path="/seller"
               element={
-                <ProtectedRoute allowedRoles={['seller']}>
+                <ProtectedRoute allowedRoles={["seller"]}>
                   <SellerDashboard />
                 </ProtectedRoute>
               }
