@@ -1,71 +1,127 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { generateProductDetails } from "../utils/gemini";
+import ReactMarkdown from "react-markdown";
 
-interface Product {
+interface ProductDetails {
   id: number;
   name: string;
   image: string;
   description: string;
-  price?: string;
+  detailed_info: string;
 }
 
-const sampleProducts: Product[] = [
-  { id: 1, name: "Moovandan", image: "https://www.fortheloveofnature.in/cdn/shop/products/Mangiferaindica-Moovandan_Mango_1_823x.jpg?v=1640246605", description: "A Popular Early-Bearing Variety" },
-  { id: 2, name: "Kilichundan Mango", image: "https://www.greensofkerala.com/wp-content/uploads/2021/04/kilichundan-manga-2.gif", description: "The Parrot-Beak Mango with a Tangy-Sweet Flavor" },
-  { id: 3, name: "Neelum", image: "https://tropicaltreeguide.com/wp-content/uploads/2023/04/Mango_Neelum_Fruit_IG_Botanical_Diversity_3-1024x1014.jpg", description: "A High-Yielding and Disease-Resistant Variety of Mango" }
-
-
-
-
-
-
-
-
-
-  
-];
-
-const ProductDetails = () => {
+const ProductDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const product = sampleProducts.find((p) => p.id === Number(id));
-
-  const [aiDescription, setAiDescription] = useState<string>("Loading AI-generated details...");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [product, setProduct] = useState<ProductDetails | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasFetched, setHasFetched] = useState(false); // Prevent multiple updates
 
   useEffect(() => {
-    if (product) {
-      setLoading(true);
-      setError(null);
-      generateProductDetails(product.name)
-        .then((details) => setAiDescription(details))
-        .catch((err) => {
-          console.error("Error fetching AI details:", err);
-          setError("Failed to load AI-generated details.");
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [product]);
+    const fetchProductDetails = async () => {
+      if (hasFetched) return; // Prevent duplicate fetch calls
 
-  if (!product) {
-    return <h2 className="text-center text-red-500">Product not found.</h2>;
-  }
+      setHasFetched(true);
+      setLoading(true);
+
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/get_product_details?id=${id}`
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch product details");
+        }
+
+        setProduct(data);
+      } catch (error) {
+        setError((error as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductDetails();
+  }, [id, hasFetched]); // Dependency ensures it only runs once per id change
+
+  if (loading)
+    return <p className="text-center text-gray-500 text-xl">Loading...</p>;
+  if (error)
+    return (
+      <p className="text-center text-red-500 text-xl font-semibold">{error}</p>
+    );
+  if (!product)
+    return (
+      <p className="text-center text-gray-500 text-xl">Product not found.</p>
+    );
 
   return (
-    <div className="max-w-3xl mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
-      <img src={product.image} alt={product.name} className="w-full h-64 object-cover rounded-md" />
-      <h2 className="text-3xl font-bold text-gray-800 mt-4">{product.name}</h2>
-      <p className="text-gray-600 mt-2">{product.description}</p>
-      <p className="text-green-700 font-bold mt-4">{product.price || "Price not available"}</p>
-      <h3 className="text-xl font-semibold mt-6">AI-Generated Details</h3>
-      {loading ? (
-        <p className="text-gray-500">Fetching details...</p>
-      ) : error ? (
-        <p className="text-red-500">{error}</p>
-      ) : (
-        <p className="text-gray-700 mt-2">{aiDescription}</p>
-      )}
+    <div className="container mx-auto p-6 flex flex-col lg:flex-row items-center lg:items-start gap-8">
+      {/* Left Side - Image & Name */}
+      <div className="w-full lg:w-1/3 flex flex-col items-center">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-80 object-cover rounded-lg shadow-lg"
+        />
+        <h1 className="text-4xl font-bold text-gray-800 mt-4 text-center lg:text-left">
+          {product.name}
+        </h1>
+        <p className="text-lg text-gray-600 mt-2">{product.description}</p>
+      </div>
+
+      {/* Right Side - Details */}
+      <div className="w-full lg:w-2/3 bg-white p-6 shadow-lg rounded-lg border border-gray-200">
+        <h2 className="text-3xl font-semibold mt-6 text-gray-800 border-b-2 pb-2">
+          Detailed Information
+        </h2>
+
+        {/* Beautified Markdown Styling */}
+        <div className="mt-4 text-lg text-gray-700 leading-relaxed bg-gray-50 p-4 rounded-lg border-l-4 border-blue-400 shadow-sm">
+          <ReactMarkdown
+            components={{
+              h1: (props) => (
+                <h1
+                  className="text-2xl font-bold mt-4 text-blue-700"
+                  {...props}
+                />
+              ),
+              h2: (props) => (
+                <h2
+                  className="text-xl font-semibold mt-3 text-blue-600"
+                  {...props}
+                />
+              ),
+              h3: (props) => (
+                <h3
+                  className="text-lg font-medium mt-2 text-blue-500"
+                  {...props}
+                />
+              ),
+              p: (props) => <p className="mt-2 text-gray-700" {...props} />,
+              ul: (props) => (
+                <ul
+                  className="list-disc list-inside mt-2 space-y-1 text-gray-700"
+                  {...props}
+                />
+              ),
+              ol: (props) => (
+                <ol
+                  className="list-decimal list-inside mt-2 space-y-1 text-gray-700"
+                  {...props}
+                />
+              ),
+              li: (props) => <li className="ml-4" {...props} />,
+              strong: (props) => (
+                <strong className="text-gray-900 font-semibold" {...props} />
+              ),
+            }}
+          >
+            {product.detailed_info}
+          </ReactMarkdown>
+        </div>
+      </div>
     </div>
   );
 };

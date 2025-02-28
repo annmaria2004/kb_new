@@ -1,4 +1,3 @@
-import React from 'react';
 import { Leaf, Sprout, FlaskRound as Flask, Droplets } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ProductCard } from '../components/ProductCard';
@@ -37,7 +36,6 @@ const products = [
   { id: 1, name: "Moovandan", image: "https://www.fortheloveofnature.in/cdn/shop/products/Mangiferaindica-Moovandan_Mango_1_823x.jpg?v=1640246605", description: "A Popular Early-Bearing Variety" },
   { id: 2, name: "Kilichundan Mango", image: "https://www.greensofkerala.com/wp-content/uploads/2021/04/kilichundan-manga-2.gif", description: "The Parrot-Beak Mango with a Tangy-Sweet Flavor" },
   { id: 3, name: "Neelum", image: "https://tropicaltreeguide.com/wp-content/uploads/2023/04/Mango_Neelum_Fruit_IG_Botanical_Diversity_3-1024x1014.jpg", description: "A High-Yielding and Disease-Resistant Variety of Mango"},
-
   { id: 4, name: "Alphonso", image: "https://seed2plant.in/cdn/shop/files/AlphonsoMangoGraftedLivePlant.jpg?v=1689071379&width=1100", description:"The King of Mangoes" },
   { id: 5, name: "Cowpea", image: "https://seed2plant.in/cdn/shop/products/cowpeaseeds.jpg?v=1603962956&width=1780", description: "Drought-tolerant legume " },
   { id: 6, name: "Yardlong Bean", image: "https://m.media-amazon.com/images/I/61GCtRXQUNL.jpg", description: "Locally known as Achinga Payar is a popular vegetable characterized by its slender, elongated pods" },
@@ -117,13 +115,11 @@ export const Home = () => {
               <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded-md mb-4" />
               <h3 className="text-lg font-semibold text-gray-800 mb-2">{product.name}</h3>
               <p className="text-gray-600">{product.description}</p>
-              <p className="text-green-700 font-bold mt-2">{product.price}</p>
               <Link to={`/products/${product.id}`} className="text-blue-500 hover:underline mt-2 inline-block">Read More</Link>
             </div>
           ))}
         </div>
       </section>
-...
     </div>
   );
 };
